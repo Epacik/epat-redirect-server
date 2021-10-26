@@ -22,6 +22,12 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: target
-        path: target
+        path: |
+              target
+              !.fingerprint
+              !build
+              !deps
+              !examples
+              !incremental
 #    - name: Run tests
 #      run: cargo test --verbose
