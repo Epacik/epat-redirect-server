@@ -29,10 +29,10 @@ jobs:
               !deps
               !examples
               !incremental
-              !target\*\.fingerprint
-              !target\*\build
-              !target\*\deps
-              !target\*\examples
-              !target\*\incremental
+              !target\debug\.fingerprint
+              !target\debug\build
+              !target\debug\deps
+              !target\debug\examples
+              !target\debug\incremental
 #    - name: Run tests
 #      run: cargo test --verbose
