@@ -4,6 +4,7 @@ extern crate lazy_static;
 
 mod request_handling;
 mod database;
+mod macros;
 
 use std::io::prelude::*;
 use async_std::net::TcpListener;

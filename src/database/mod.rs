@@ -1,3 +1,4 @@
+#[macro_use]
 pub(crate) mod connection;
 pub(crate) mod links;
 pub(crate) mod open_graph;

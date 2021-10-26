@@ -48,6 +48,7 @@ async fn get_response(request: String) -> String {
             .trim();
 
     let result_option: Option<database::links::Links> = database::RB.fetch_by_column("lnk_path", &path).await.unwrap();
+
     match result_option {
         Some(res) => return responses::redirect_response(res).await,
         None => return responses::not_found_response(),
