@@ -4,10 +4,12 @@ use crate::macros::attempt;
 use std::error::Error;
 use std::fs;
 use rbatis::rbatis::Rbatis;
+use serde::{Deserialize, Serialize};
+use serde_json::{from_str, Value};
 
 pub async fn create() {
     let connectionstring = load_connection_string();
-    crate::database::RB.link("postgres://postgres:postgres@localhost:5432/epat_webdb").await.unwrap();
+    crate::database::RB.link(&*connectionstring).await.unwrap();
 }
 
 fn load_connection_string() -> String {
@@ -16,28 +18,39 @@ fn load_connection_string() -> String {
         Ok(config) => content = config,
         Err(err) => {
             let emptyConfig =  Config {
-                address: String(),
-                server: String(),
-                username: String(),
-                password: String(),
+                address: "".to_string(),
+                username: "".to_string(),
+                password: "".to_string(),
+                database: "".to_string(),
             };
 
-            fs::write("./config", serde_json)
+            match serde_json::to_vec_pretty(&emptyConfig){
+                Ok(value) => {
+                    fs::write("./config.json", value);
+                    panic!();
+                },
+                Err(err) => {
+                    panic!();
+                },
+            }
         }
     }
 
+    let config: Config = from_str(&*content).unwrap();
 
-    return "".to_string();
+
+    return format!("postgres://{}:{}@{}:5432/{}", config.username, config.password, config.address, config.database);
 }
 
-fn load_config_file() -> Result<String, dyn Error>{
-    let content = fs::read_to_string("./config.json").expect("Error loading file");
+fn load_config_file() -> Result<String, Box<dyn Error>>{
+    let content = fs::read_to_string("./config.json")?;
     Ok(content)
 }
 
-struct Config {
+#[derive(Serialize, Deserialize)]
+pub struct Config {
     pub address: String,
-    pub server: String,
     pub username: String,
     pub password: String,
+    pub database: String,
 }
