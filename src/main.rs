@@ -20,7 +20,7 @@ async fn main() {
     database::connection::create().await;
 
     info!("Starting a new redirect server");
-    let listener = TcpListener::bind("127.0.0.1:7878").await.unwrap();
+    let listener = TcpListener::bind("0.0.0.0:7878").await.unwrap();
 
 
     listener.incoming().for_each_concurrent(None, |stream| async move {
