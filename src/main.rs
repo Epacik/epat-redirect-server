@@ -11,7 +11,7 @@ use async_std::net::TcpListener;
 use async_std::net::TcpStream;
 use futures::stream::StreamExt;
 
-use std::{thread, time};
+use std::{panic, thread, time};
 use async_std::task::spawn;
 use log::{info, trace, warn};
 

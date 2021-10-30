@@ -11,13 +11,15 @@ use crate::database;
 
 
 pub(crate) async fn handle_connection(mut stream: TcpStream) {
+    let response : String;
+
     let mut buffer = [0; 1024];
 
     stream.read(&mut buffer).await.unwrap();
 
     let request_str: &str = str::from_utf8(&buffer).unwrap();
 
-    let response : String = get_response(request_str.to_string()).await;
+    response = get_response(request_str.to_string()).await;
 
     stream.write(response.as_bytes()).await.unwrap();
     stream.flush().await.unwrap();

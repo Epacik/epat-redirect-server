@@ -4,6 +4,9 @@ mod not_found;
 mod redirect_trough_http302;
 mod invalid;
 mod redirect_trough_javascript;
+mod internal_error;
+
+pub fn internal_server_error() -> String { return internal_error::response(); }
 
 /// Returns 400 Bad Request
 pub fn invalid_response() -> String {
