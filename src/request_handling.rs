@@ -60,10 +60,11 @@ async fn get_response(request: String) -> String {
 
     let result_option: Option<database::links::Links> = database::RB.fetch_by_column("lnk_path", &path).await.unwrap();
 
-    match result_option {
-        Some(res) => return redirect_response(res).await,
-        None => return not_found_response(),
+    if result_option.is_none(){
+        return not_found_response();
     }
+
+    return redirect_response(res).await
 }
 
 fn is_request_valid(request: String) -> bool {
