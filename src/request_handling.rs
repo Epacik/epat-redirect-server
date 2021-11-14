@@ -1,14 +1,15 @@
+#![deny(warnings)]
+
 use std::str;
 use async_std::net::TcpStream;
 use futures::{AsyncReadExt, AsyncWriteExt};
-use log::{info, trace, warn};
 use rbatis::crud::CRUD;
 use crate::database;
 use crate::responses::{invalid_response, not_found_response, redirect_response};
 
 
 pub(crate) async fn handle_connection(mut stream: TcpStream) {
-    info!("przetwarzanie zapytania od: {}", stream.peer_addr().unwrap());
+    log::info!("przetwarzanie zapytania od: {}", stream.peer_addr().unwrap());
     let response : String;
 
     let mut buffer = [0; 1024];
@@ -25,7 +26,7 @@ pub(crate) async fn handle_connection(mut stream: TcpStream) {
 
 async fn get_response(request: String) -> String {
     if ! is_request_valid(request.clone()) {
-        info!("niepoprawne zapytanie");
+        log::info!("niepoprawne zapytanie");
         return invalid_response();
     }
 
@@ -64,11 +65,11 @@ async fn get_response(request: String) -> String {
         return not_found_response();
     }
 
-    return redirect_response(res).await
+    return redirect_response(result_option.unwrap()).await
 }
 
 fn is_request_valid(request: String) -> bool {
-    if(!request.starts_with("GET") || request.starts_with("GET / "))
+    if !request.starts_with("GET") || request.starts_with("GET / ")
     {
         return false;
     }

@@ -1,34 +1,33 @@
 use crate::database::links::Links;
 use crate::database::open_graph::OpenGraph;
-use log::{info, trace, warn};
 use rbatis::crud::CRUD;
 
-pub fn internal_server_error() -> String {
-    info!("Creating 500 Internal server error");
-
-    let content = r#"<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Internal server error/title>
-  </head>
-  <body>
-    <h1>Internal server error</h1>
-  </body>
-</html>"#;
-
-    let response = format!(
-        "HTTP/1.1 500 Internal Server Error\r\nContent-Length: {}\r\n\r\n{}",
-        content.len(),
-        content
-    );
-
-    return response;
-}
+// pub fn internal_server_error() -> String {
+//     log::info!("Creating 500 Internal server error");
+//
+//     let content = r#"<!DOCTYPE html>
+// <html lang="en">
+//   <head>
+//     <meta charset="utf-8">
+//     <title>Internal server error/title>
+//   </head>
+//   <body>
+//     <h1>Internal server error</h1>
+//   </body>
+// </html>"#;
+//
+//     let response = format!(
+//         "HTTP/1.1 500 Internal Server Error\r\nContent-Length: {}\r\n\r\n{}",
+//         content.len(),
+//         content
+//     );
+//
+//     return response;
+// }
 
 /// Returns 400 Bad Request
 pub fn invalid_response() -> String {
-    info!("Creating 400 bad reqiest");
+    log::info!("Creating 400 bad request");
 
     let content = r#"<!DOCTYPE html>
 <html lang="en">
@@ -52,7 +51,7 @@ pub fn invalid_response() -> String {
 
 /// Returns 404 not found
 pub fn not_found_response() -> String {
-    info!("Creating 404 not found response");
+    log::info!("Creating 404 not found response");
 
     let content = r#"<!DOCTYPE html>
 <html lang="en">
@@ -95,7 +94,7 @@ pub(crate) fn redirect_trough_http302(link: Links) -> String {
 
 
 pub async fn redirect_trough_javascript(link: Links) -> String {
-    info!("Creating redirect trough javascript");
+    log::info!("Creating redirect trough javascript");
 
     let tags : Vec<OpenGraph> = crate::database::RB.fetch_list_by_column("log_link_id", &[link.lnk_id]).await.unwrap();
 
@@ -103,11 +102,14 @@ pub async fn redirect_trough_javascript(link: Links) -> String {
     let mut content: String = String::from(r#"<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">"#);
+    <meta charset="utf-8">
+    <title>Some title</title>
+    <meta name="description" content="Some description">"#);
 
     for og in &tags {
         let tag = create_og_tag(og);
         content += &*tag;
+        content += "\n";
     }
 
     content += r#"
@@ -123,11 +125,8 @@ pub async fn redirect_trough_javascript(link: Links) -> String {
 </html>
     "#;
 
-
-
-
     let response = format!(
-        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\ncontent-type: text/html\r\n\r\n{}",
         content.len(),
         content
     );

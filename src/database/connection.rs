@@ -1,10 +1,7 @@
 use std::error::Error;
 use std::fs;
 use std::panic::panic_any;
-use rbatis::rbatis::Rbatis;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use log::{info, trace, warn};
 
 /// Tworzenie połączenia z serwerem baz danych
 pub async fn create() {
@@ -19,7 +16,7 @@ fn load_connection_string() -> String {
     let content :String;
 
     //załadujmy plik konfiguracyjny
-    let mut result = load_config_file();
+    let  result = load_config_file();
 
     // jeśli nie wyszło, tworzymy pusty plik konfiguracyjnymi i panikujemy zabijając cały proces
     if result.is_err() {
@@ -57,7 +54,7 @@ fn create_empty_config() {
     };
 
     // konwertujemy strukturę do ładnie sformatownego JSONa (takiego rozpisanego na wiele linijek)
-    let mut result = serde_json::to_vec_pretty(&empty_config);
+    let result = serde_json::to_vec_pretty(&empty_config);
 
     // jeśli konwersja się nie4 powiodła, panikujemy zabijając proces
     if result.is_err() {

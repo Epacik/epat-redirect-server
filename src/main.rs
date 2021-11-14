@@ -1,26 +1,32 @@
+#![deny(warnings)]
 #[macro_use]
 extern crate rbatis;
 extern crate lazy_static;
 
 mod request_handling;
 mod database;
-mod macros;
 mod responses;
+mod logger;
 
-use std::io::prelude::*;
 use async_std::net::TcpListener;
-use async_std::net::TcpStream;
 use futures::stream::StreamExt;
 
-use std::{panic, thread, time};
+use std::panic;
 use async_std::task::spawn;
-use log::{info, trace, warn};
+use log::LevelFilter;
+static LOGGER: logger::Logger = logger::Logger;
 
 #[async_std::main]
 async fn main() {
+    let set_logger_result = log::set_logger(&LOGGER).map(|()| log::set_max_level(LevelFilter::Debug));
+    if set_logger_result.is_err(){
+        panic!("{}", set_logger_result.unwrap_err().to_string());
+    }
+
+    log::info!("Connecting to sql server");
     database::connection::create().await;
 
-    info!("Starting a new redirect server");
+    log::info!("Starting a new redirect server");
     let listener = TcpListener::bind("0.0.0.0:7878").await.unwrap();
 
 
