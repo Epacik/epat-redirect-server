@@ -10,7 +10,7 @@ use crate::responses::{invalid_response, not_found_response, redirect_response};
 
 pub(crate) async fn handle_connection(mut stream: TcpStream) {
     log::info!("przetwarzanie zapytania od: {}", stream.peer_addr().unwrap());
-    let response : String;
+    let response: String;
 
     let mut buffer = [0; 1024];
 
@@ -25,7 +25,8 @@ pub(crate) async fn handle_connection(mut stream: TcpStream) {
 }
 
 async fn get_response(request: String) -> String {
-    if ! is_request_valid(request.clone()) {
+
+    if !is_request_valid(request.clone()) {
         log::info!("niepoprawne zapytanie");
         return invalid_response();
     }
@@ -43,23 +44,29 @@ async fn get_response(request: String) -> String {
 
     match slash_position_option {
         Some(pos) => slash_position = pos,
-        None            => slash_position = 0,
+        None      => slash_position = 0,
     }
     match http_position_option {
         Some(pos) => http_position = pos,
-        None            => http_position = 0,
+        None      => http_position = 0,
     }
 
-    //interesują nas te konkretne pozycje, poniważ pozwalają one na wyizolowanie ścieżki do zasobu
+    // interesują nas te konkretne pozycje, poniważ pozwalają one na wyizolowanie ścieżki do zasobu
     // w przypadku zapytania pokazanego powyżej, będzie to "test"
     // w przypadku poniższego zapytania będzie to "jakas/wieloczesciowa/sciezka"
     // GET /jakas/wieloczesciowa/sciezka HTTP/1.1
     let path = request
-            .split_at(http_position)     .0 //najpierw dzielimy ciąg w w miejscu w którym znajduje się "HTTP", i bierzemy część od początku tekstu, do HTTP
-            .split_at(slash_position + 1).1 //Następnie dzielimy ciąg w miejscu pierwszego ukośnika, i bierzemy część od ukośnika, do końca tekstu
-            .trim(); // przycinamy niepotrzebne białe znaki z początkui i końca tekstu
+            .split_at(http_position).0 
+            // najpierw dzielimy ciąg w w miejscu w którym znajduje się "HTTP", 
+            // i bierzemy część od początku tekstu, do HTTP
+            .split_at(slash_position + 1).1 
+            // Następnie dzielimy ciąg w miejscu pierwszego ukośnika, 
+            // i bierzemy część od ukośnika, do końca tekstu
+            .trim(); // przycinamy niepotrzebne białe znaki z początku i końca tekstu
 
-    let result_option: Option<database::links::Links> = database::RB.fetch_by_column("lnk_path", &path).await.unwrap();
+    let result_option: Option<database::links::Links> = 
+        database::RB.fetch_by_column("lnk_path", &path).await.unwrap();
+
 
     if result_option.is_none(){
         return not_found_response();
